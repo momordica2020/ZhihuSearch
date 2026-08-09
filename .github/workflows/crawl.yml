@@ -1,0 +1,69 @@
+name: 知乎搜索索引更新
+
+on:
+  # 定时触发：每 6 小时运行一次（可自行调整 cron 表达式）
+  schedule:
+    - cron: "30 */6 * * *"
+  # 支持手动触发（Actions 页面点击 Run workflow）
+  workflow_dispatch:
+
+# 允许该工作流写入仓库（用于提交更新后的索引）并用于 Pages 部署
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: zhihu-index
+  cancel-in-progress: false
+
+jobs:
+  crawl-and-deploy:
+    runs-on: ubuntu-latest
+    # 部署到 GitHub Pages 的前提
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: 运行爬虫
+        env:
+          # 可选：注入已登录的知乎 Cookie，提升可见内容覆盖率（在仓库 Secrets 配置 ZHIHU_COOKIE）
+          ZHIHU_COOKIE: ${{ secrets.ZHIHU_COOKIE }}
+          # 单次运行访问上限，避免 CI 耗时过长或触发限流
+          ZHIHU_MAX_VISITS: "60"
+          ZHIHU_MAX_DEPTH: "3"
+        run: python crawler/crawler.py
+
+      - name: 提交更新后的索引
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "更新知乎搜索索引 $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "无变更，跳过提交"
+          git push
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传站点产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: 部署到 Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

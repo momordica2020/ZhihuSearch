@@ -1,0 +1,17 @@
+# 每行一个种子链接，# 开头为注释。
+# 反爬实测结论（headless + 反指纹）：
+#   - 问题页 /question/{id} 可匿名完整抓取（标题+回答）
+#   - 基础话题页 /topic/{id} 可访问，含子话题链接与少量问题链接
+#   - 话题列表 /topic/{id}/questions、热榜 /hot、搜索 /search 需登录态，匿名不可用
+# 因此种子主要用已知 AI 问题页 + AI 话题页，靠 BFS 沿“相关问题”和子话题扩展。
+
+# AI 问题种子（已验证可匿名抓取）
+https://www.zhihu.com/question/510340037
+https://www.zhihu.com/question/58863937
+https://www.zhihu.com/question/316343589
+https://www.zhihu.com/question/49263055
+
+# AI 话题种子（基础页，供发现子话题与问题）
+https://www.zhihu.com/topic/19551275
+https://www.zhihu.com/topic/19556498
+https://www.zhihu.com/topic/19724543

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>知乎内容搜索索引</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>知乎内容搜索索引</h1>
+    <p class="subtitle">自建检索库 · 逐页抓取话题/作者/问题 · 仅索引元数据，不存储全文</p>
+  </header>
+
+  <main class="container">
+    <div class="search-box">
+      <input
+        id="search-input"
+        type="search"
+        placeholder="输入关键词，支持模糊搜索，如：Python"
+        autocomplete="off"
+        autofocus
+      >
+      <div class="search-meta">
+        <span id="result-count">请稍候，正在加载索引…</span>
+        <span id="updated-at"></span>
+      </div>
+    </div>
+
+    <div id="results" class="results"></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>数据来源：知乎公开页面元数据 · 检索范围请编辑 <code>seeds.txt</code></p>
+  </footer>
+
+  <script src="vendor/minisearch.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

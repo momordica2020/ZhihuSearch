@@ -1,0 +1,146 @@
+{
+  "generated_at": "2026-08-09T05:26:02Z",
+  "count": 14,
+  "items": [
+    {
+      "kind": "回答",
+      "title": "什么是知乎的个人与机构认证？",
+      "excerpt": "个人认证：知乎在对用户账号信息的真实性进行审核后，会在账号主页以及用户名旁边带上蓝色的认证标识。\n\n机构认证：为了保障机构号资质信息的真实性与安全性，知乎平台为入驻机构提供「认证」服务。机构「认证」后账号主页及用户名旁边将展示蓝色认证标识，并标识为「已认证的账号」，享受名称保护、数据分析等额外权益。\n\n什么是「知乎个人",
+      "author": "知乎小管家",
+      "url": "https://www.zhihu.com/question/48510028#answer-0",
+      "votes": 2301,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "什么是知乎「新知答主」标识？",
+      "excerpt": "知乎「新知答主」来自于站内各领域深耕创作的答主，他们拥有杰出的创作专业性、社区影响力和用户喜爱度。他们代表着知乎答主专业、认真、理性乐观的创作精神，值得信赖。\n\n每位知乎答主都像一盏盏路灯，慷慨、可靠和温暖。一盏路灯照亮一段路，无数盏路灯照亮这个星球上所有的路，给寻找答案的人们带来光亮。\n\n知乎将会以年为周期公布「新知",
+      "author": "知乎小管家",
+      "url": "https://www.zhihu.com/question/510340037#answer-0",
+      "votes": 211,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "如何提高做文本分类的CNN的泛化能力？",
+      "excerpt": "作者：清凇 链接：https://zhuanlan.zhihu.com/p/25928551\n\n一、传统文本分类方法\n\n文本分类问题算是自然语言处理领域中一个非常经典的问题了，相关研究最早可以追溯到上世纪50年代，当时是通过专家规则（Pattern）进行分类，甚至在80年代初一度发展到利用知识工程建立专家系统，这样做的",
+      "author": "知乎用户",
+      "url": "https://www.zhihu.com/question/58863937#answer-0",
+      "votes": 21,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "如何提高做文本分类的CNN的泛化能力？",
+      "excerpt": "CNN处理文本 一般wordembeding来表示词的 CNN本身是不考虑前后两个训练样本之间的关联性 他只对当前样本负责 只对某一类别的loss函数负责 。\n\n在具体的训练过程中 要控制好格式问题 因为空格也是一个字符，尽量预处理样本 例如去掉停用词 将标点符号或者邮箱或者手机号码统一用一组标识符替换 对行进行切割等",
+      "author": "Jerry",
+      "url": "https://www.zhihu.com/question/58863937#answer-1",
+      "votes": 1,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "如何提高做文本分类的CNN的泛化能力？",
+      "excerpt": "推荐一下这个项目\n\ndennybritz/cnn-text-classification-tf",
+      "author": "AlexNet",
+      "url": "https://www.zhihu.com/question/58863937#answer-2",
+      "votes": 1,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "利用神经网络解决文本分类问题,若数据集各类别的数据总量不等,会产生怎样的影响?",
+      "excerpt": "",
+      "author": "知乎用户",
+      "url": "https://www.zhihu.com/question/49263055#answer-0",
+      "votes": 1,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "什么是知乎「新知答主」标识？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/510340037",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "如何提高做文本分类的CNN的泛化能力？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/58863937",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "文本分类的模型如何常驻？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/316343589",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类的模型如何常驻？",
+      "excerpt": "把模型变量定义为模块变量。\n\n再定义一个初始化模型的函数，在服务启动时调用。这个函数里对该变量重新赋值前，要加global关键字。\n\n然后在分类的地方直接引用这个模型变量。",
+      "author": "匠人的OP",
+      "url": "https://www.zhihu.com/question/316343589#answer-0",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类的模型如何常驻？",
+      "excerpt": "当然有方法。\n只是你还不知道怎么一次性加载？\n\n不管是什么框架， 注意就是模型放到内存里面就要不再释放内存啦， 推理的时候直接读内存权重和结构去推理。\n\n如果没搞明白建议你深入一点点文档、实现原理、或者源码多了解一下。",
+      "author": "算法观察者",
+      "url": "https://www.zhihu.com/question/316343589#answer-1",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类的模型如何常驻？",
+      "excerpt": "利用CRF模型进行文本分类完整教程（Python语言）\n\n简介\n\n世界上产生的文本数据量十分惊人：谷歌每秒处理超过40000次搜索！根据福布斯的报道，我们每分钟要发送1600万条短信，在脸谱网（Facebook）上发布51000条评论。对门外汉来说，光是掌握数据量的绝对大小就很难吧？\n\n仅新闻网站和其他在线媒体每小时就",
+      "author": "陈之炎",
+      "url": "https://www.zhihu.com/question/316343589#answer-2",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "利用神经网络解决文本分类问题,若数据集各类别的数据总量不等,会产生怎样的影响?",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/49263055",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "什么是知乎的个人与机构认证？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/48510028",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    }
+  ]
+}
