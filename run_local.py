@@ -40,7 +40,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("local-runner")
 
-DEFAULT_ROUND_INTERVAL = 600
+DEFAULT_ROUND_INTERVAL = 0
 # 需要 git 跟踪的产物（分片目录整个跟踪，gitignore 已排除中间文件）
 TRACKED = ["data/index.json", "data/index.json.gz", "data/parts"]
 
