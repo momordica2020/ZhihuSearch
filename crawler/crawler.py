@@ -405,10 +405,22 @@ def save_progress(results, seen_by_url):
         "count": len(results),
         "items": results,
     }
+    # 紧凑 JSON，显著减小体积，避免内容增长后触发 GitHub 单文件限制
+    compact = json.dumps(index, ensure_ascii=False, separators=(",", ":"))
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(index, f, ensure_ascii=False, indent=2)
+        f.write(compact)
+    # 站点实际加载 index.json（见 app.js），这里仅保证本地可读
     with open(SEEN_FILE, "w", encoding="utf-8") as f:
-        json.dump(sorted(seen_by_url), f, ensure_ascii=False, indent=2)
+        json.dump(sorted(seen_by_url), f, ensure_ascii=False)
+    # 生成 gzip 压缩版，供前端在线解压（见 app.js），进一步降低传输与存储体积
+    try:
+        import gzip
+        gz_path = OUTPUT_FILE + ".gz"
+        with open(gz_path, "wb") as f:
+            with gzip.GzipFile(fileobj=f, mode="wb", mtime=0) as gz:
+                gz.write(compact.encode("utf-8"))
+    except Exception as exc:
+        logger.warning("生成 gzip 压缩失败: %s", exc)
 
 
 if __name__ == "__main__":

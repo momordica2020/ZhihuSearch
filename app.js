@@ -7,6 +7,7 @@
   "use strict";
 
   var INDEX_URL = "data/index.json";
+  var INDEX_GZ_URL = "data/index.json.gz";
   var input = document.getElementById("search-input");
   var resultList = document.getElementById("results");
   var countEl = document.getElementById("result-count");
@@ -14,6 +15,54 @@
 
   var allItems = [];
   var mini = null;
+
+  // 优先加载 gzip 压缩版索引并在线解压，可容纳更多内容；
+  // 若浏览器不支持或请求失败，回退到未压缩的 index.json。
+  function loadIndex() {
+    function parseJson(data) {
+      allItems = data.items || [];
+      mini = new MiniSearch({
+        idField: "url",
+        fields: ["title", "excerpt", "author"],
+        storeFields: ["kind", "title", "excerpt", "author", "url", "votes", "comments", "time"],
+      });
+      mini.addAll(allItems);
+      if (data.generated_at) {
+        updatedEl.textContent = "更新于 " + data.generated_at;
+      }
+      countEl.textContent = "共收录 " + allItems.length + " 条";
+      if (input.value) search(input.value);
+    }
+
+    function fetchJson(url) {
+      return fetch(url).then(function (resp) {
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        var ct = (resp.headers.get("content-type") || "").toLowerCase();
+        // 若服务器已按 gzip 解压或返回纯 JSON，直接解析
+        if (ct.indexOf("gzip") < 0 && ct.indexOf("json") >= 0) {
+          return resp.json();
+        }
+        return resp.arrayBuffer().then(function (buf) {
+          if (typeof DecompressionStream === "undefined") {
+            throw new Error("浏览器不支持 gzip 解压");
+          }
+          var ds = new DecompressionStream("gzip");
+          return new Response(new Blob([buf]).stream().pipeThrough(ds)).json();
+        });
+      });
+    }
+
+    // 优先 gzip，失败则回退未压缩版
+    fetchJson(INDEX_GZ_URL)
+      .then(parseJson)
+      .catch(function () {
+        return fetchJson(INDEX_URL).then(parseJson);
+      })
+      .catch(function (err) {
+        countEl.textContent = "索引加载失败：" + err.message;
+        updatedEl.textContent = "";
+      });
+  }
 
   // Mark 高亮：把命中词包上 <mark>
   function highlight(text, terms) {
@@ -120,29 +169,7 @@
   }
 
   function init() {
-    fetch(INDEX_URL)
-      .then(function (resp) {
-        if (!resp.ok) throw new Error("HTTP " + resp.status);
-        return resp.json();
-      })
-      .then(function (data) {
-        allItems = data.items || [];
-        mini = new MiniSearch({
-          idField: "url",
-          fields: ["title", "excerpt", "author"],
-          storeFields: ["kind", "title", "excerpt", "author", "url", "votes", "comments", "time"],
-        });
-        mini.addAll(allItems);
-        if (data.generated_at) {
-          updatedEl.textContent = "更新于 " + data.generated_at;
-        }
-        countEl.textContent = "共收录 " + allItems.length + " 条";
-        if (input.value) search(input.value);
-      })
-      .catch(function (err) {
-        countEl.textContent = "索引加载失败：" + err.message;
-        updatedEl.textContent = "";
-      });
+    loadIndex();
   }
 
   input.addEventListener("input", function () {
