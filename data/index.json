@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-09T05:26:02Z",
-  "count": 14,
+  "generated_at": "2026-08-09T06:06:14Z",
+  "count": 24,
   "items": [
     {
       "kind": "回答",
       "title": "什么是知乎的个人与机构认证？",
       "excerpt": "个人认证：知乎在对用户账号信息的真实性进行审核后，会在账号主页以及用户名旁边带上蓝色的认证标识。\n\n机构认证：为了保障机构号资质信息的真实性与安全性，知乎平台为入驻机构提供「认证」服务。机构「认证」后账号主页及用户名旁边将展示蓝色认证标识，并标识为「已认证的账号」，享受名称保护、数据分析等额外权益。\n\n什么是「知乎个人",
-      "author": "知乎小管家",
+      "author": "知乎小管家​",
       "url": "https://www.zhihu.com/question/48510028#answer-0",
       "votes": 2301,
       "comments": 0,
@@ -16,9 +16,29 @@
       "kind": "回答",
       "title": "什么是知乎「新知答主」标识？",
       "excerpt": "知乎「新知答主」来自于站内各领域深耕创作的答主，他们拥有杰出的创作专业性、社区影响力和用户喜爱度。他们代表着知乎答主专业、认真、理性乐观的创作精神，值得信赖。\n\n每位知乎答主都像一盏盏路灯，慷慨、可靠和温暖。一盏路灯照亮一段路，无数盏路灯照亮这个星球上所有的路，给寻找答案的人们带来光亮。\n\n知乎将会以年为周期公布「新知",
-      "author": "知乎小管家",
+      "author": "知乎小管家​",
       "url": "https://www.zhihu.com/question/510340037#answer-0",
       "votes": 211,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类时如何让模型侧重部分文本？",
+      "excerpt": "泻药。\n\n算是对楼主补充及扩充吧，从不修改BERT结构和在BERT结构上增加新参数两个方向出发。，如下：\n\n一、不修改BERT结构\n\n（1）采用原始的token_type进行区分，1为主要依据文本，0为上下文文本；\n\n（2）在主要依据文本前后加上vocab中的[unused]标记，或采用关键词抽取工具，抽取主要依据文本",
+      "author": "刘聪NLP​",
+      "url": "https://www.zhihu.com/question/541482396#answer-0",
+      "votes": 128,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类时如何让模型侧重部分文本？",
+      "excerpt": "讯飞比赛答辩结束，笔者和小伙伴们参加了一些讯飞的比赛，今年讯飞文本分类比赛相比去年更加多元化，涉及领域、任务和数据呈现多样性，听完各位大佬的答辩之后，结合之前经验和以下赛题总结下文本分类比赛的实战思路。\n\n1 讯飞文本分类赛题总结\n1.1 非标准化疾病诉求的简单分诊挑战赛2.0 top3方案总结\n赛事任务\n\n进行简单分",
+      "author": "致Great​",
+      "url": "https://www.zhihu.com/question/541482396#answer-1",
+      "votes": 29,
       "comments": 0,
       "time": 0
     },
@@ -29,6 +49,26 @@
       "author": "知乎用户",
       "url": "https://www.zhihu.com/question/58863937#answer-0",
       "votes": 21,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "文本分类时如何让模型侧重部分文本？",
+      "excerpt": "这个场景很像某场kaggle比赛，比赛任务是在一个长文本中对每个段落进行分类，这里长文本本身就是每个段落的上下文，其实这样处理的。\n\n在每个段落开始增加一个CLS token，在段落结尾添加SEP token，BERT输出的last hidden state中取每个段落的CLS token对应的输出进行分类。\n\n你的任",
+      "author": "爱睡觉的KKY",
+      "url": "https://www.zhihu.com/question/541482396#answer-2",
+      "votes": 18,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "神经网络文本分类器可以用来做两条文本是否相似的功能吗?",
+      "excerpt": "推荐看一下我司的开源模型：\n\nhttps://github.com/PaddlePaddle/PaddleNLP/tree/develop/examples/text_matching\ngithub.com/PaddlePaddle/PaddleNLP/tree/develop/examples/text_matchi",
+      "author": "0xC001​",
+      "url": "https://www.zhihu.com/question/629590442#answer-0",
+      "votes": 2,
       "comments": 0,
       "time": 0
     },
@@ -58,6 +98,16 @@
       "excerpt": "",
       "author": "知乎用户",
       "url": "https://www.zhihu.com/question/49263055#answer-0",
+      "votes": 1,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "深度学习进行文本分类的模型？",
+      "excerpt": "合集：AI案例-自然语言处理-传媒\n\nAI问题：文本分类，识别10种类型的市场研究分析报告\n\n官网：https://www.AiSelect.club\n\n本案例数据集和源码托管网址：AiWin2023市场研究分析报告类型识别\n\n一、问题描述\n\n随着经济发展，中国居民财富持续增长。资产管理需求日益增多，资产管理业务迎来新",
+      "author": "天牛​",
+      "url": "https://www.zhihu.com/question/507925125#answer-0",
       "votes": 1,
       "comments": 0,
       "time": 0
@@ -138,6 +188,56 @@
       "excerpt": "",
       "author": "",
       "url": "https://www.zhihu.com/question/48510028",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "文本分类时如何让模型侧重部分文本？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/541482396",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "深度学习进行文本分类的模型？",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/507925125",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "深度学习进行文本分类的模型？",
+      "excerpt": "这是我的第285篇原创文章。\n\n一、引言\n\n当使用深度学习处理文本分类任务时，遵循的流程如下：\n\n首先，准备数据，而且数据量要大，才能发挥神经网络的优势；\n\n再者，进行文本预处理，将文本数据转化成向量化数据，划分训练集、验证集和测试集；\n\n其次，依据分析目标选择合适的神经网络模型，搭建网络、进行参数设置；\n\n最后，训练",
+      "author": "数据杂坛​",
+      "url": "https://www.zhihu.com/question/507925125#answer-1",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "回答",
+      "title": "深度学习进行文本分类的模型？",
+      "excerpt": "利用CRF模型进行文本分类完整教程（Python语言）\n\n简介\n\n世界上产生的文本数据量十分惊人：谷歌每秒处理超过40000次搜索！根据福布斯的报道，我们每分钟要发送1600万条短信，在脸谱网（Facebook）上发布51000条评论。对门外汉来说，光是掌握数据量的绝对大小就很难吧？\n\n仅新闻网站和其他在线媒体每小时就",
+      "author": "陈之炎",
+      "url": "https://www.zhihu.com/question/507925125#answer-2",
+      "votes": 0,
+      "comments": 0,
+      "time": 0
+    },
+    {
+      "kind": "问题",
+      "title": "神经网络文本分类器可以用来做两条文本是否相似的功能吗?",
+      "excerpt": "",
+      "author": "",
+      "url": "https://www.zhihu.com/question/629590442",
       "votes": 0,
       "comments": 0,
       "time": 0
