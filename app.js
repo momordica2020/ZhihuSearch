@@ -18,6 +18,34 @@
 
   // 优先加载 gzip 压缩版索引并在线解压，可容纳更多内容；
   // 若浏览器不支持或请求失败，回退到未压缩的 index.json。
+  // 超大规模时 index.json 为清单（shards 列表），逐片加载后合并。
+  function fetchJson(url) {
+    return fetch(url).then(function (resp) {
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var ct = (resp.headers.get("content-type") || "").toLowerCase();
+      // 若服务器已按 gzip 解压或返回纯 JSON，直接解析
+      if (ct.indexOf("gzip") < 0 && ct.indexOf("json") >= 0) {
+        return resp.json();
+      }
+      return resp.arrayBuffer().then(function (buf) {
+        if (typeof DecompressionStream === "undefined") {
+          throw new Error("浏览器不支持 gzip 解压");
+        }
+        var ds = new DecompressionStream("gzip");
+        return new Response(new Blob([buf]).stream().pipeThrough(ds)).json();
+      });
+    });
+  }
+
+  function fetchShard(url) {
+    // .gz 结尾的分片走 gzip 在线解压，普通 JSON 直接解析
+    if (/\.gz$/i.test(url)) return fetchJson(url);
+    return fetch(url).then(function (resp) {
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      return resp.json();
+    });
+  }
+
   function loadIndex() {
     function parseJson(data) {
       allItems = data.items || [];
@@ -34,27 +62,35 @@
       if (input.value) search(input.value);
     }
 
-    function fetchJson(url) {
-      return fetch(url).then(function (resp) {
+    // 先读清单：分片模式（超大规模）或全量模式都从这里开始
+    fetch("data/index.json")
+      .then(function (resp) {
         if (!resp.ok) throw new Error("HTTP " + resp.status);
-        var ct = (resp.headers.get("content-type") || "").toLowerCase();
-        // 若服务器已按 gzip 解压或返回纯 JSON，直接解析
-        if (ct.indexOf("gzip") < 0 && ct.indexOf("json") >= 0) {
-          return resp.json();
+        return resp.json();
+      })
+      .then(function (manifest) {
+        if (manifest.items) { // 兼容旧版全量索引
+          parseJson(manifest);
+          return;
         }
-        return resp.arrayBuffer().then(function (buf) {
-          if (typeof DecompressionStream === "undefined") {
-            throw new Error("浏览器不支持 gzip 解压");
-          }
-          var ds = new DecompressionStream("gzip");
-          return new Response(new Blob([buf]).stream().pipeThrough(ds)).json();
+        var shards = manifest.shards || [];
+        if (shards.length === 0) throw new Error("index.json 缺少 items/shards");
+        return Promise.all(shards.map(fetchShard)).then(function (parts) {
+          var merged = {
+            generated_at: manifest.generated_at,
+            count: manifest.count,
+            items: [],
+          };
+          parts.forEach(function (part) {
+            merged.items = merged.items.concat(part);
+          });
+          parseJson(merged);
         });
-      });
-    }
-
-    // 优先 gzip，失败则回退未压缩版
-    fetchJson(INDEX_GZ_URL)
-      .then(parseJson)
+      })
+      // 旧部署兜底：清单读取失败时回退到全量 gzip / 未压缩 JSON
+      .catch(function () {
+        return fetchJson(INDEX_GZ_URL).then(parseJson);
+      })
       .catch(function () {
         return fetchJson(INDEX_URL).then(parseJson);
       })

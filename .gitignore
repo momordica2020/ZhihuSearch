@@ -11,3 +11,9 @@ debug.log
 
 # 爬取断点文件（可重新生成）
 data/seen.json
+
+# 可再生的调试/统计文件，不入库以压缩仓库体积
+data/index.full.json
+data/stats.json
+data/.push_state.json
+data/seed_pool.json
