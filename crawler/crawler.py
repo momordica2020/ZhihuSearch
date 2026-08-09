@@ -39,8 +39,13 @@ SEEN_FILE = os.path.join(BASE_DIR, "data", "seen.json")
 
 MAX_VISITS = int(os.environ.get("ZHIHU_MAX_VISITS", "300"))
 MAX_DEPTH = int(os.environ.get("ZHIHU_MAX_DEPTH", "3"))
-DELAY_RANGE = (2.5, 5.0)
+# 单次访问间隔（秒），可通过环境变量覆盖实现"稳中提速"，默认 1.5~3.0
+DELAY_MIN = float(os.environ.get("ZHIHU_DELAY_MIN", "1.5"))
+DELAY_MAX = float(os.environ.get("ZHIHU_DELAY_MAX", "3.0"))
+DELAY_RANGE = (DELAY_MIN, DELAY_MAX)
 PAGE_TIMEOUT = 30000
+# 页面加载后额外停留（秒），用于等待动态内容渲染
+SETTLE_MS = int(os.environ.get("ZHIHU_SETTLE_MS", "1500"))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -223,8 +228,28 @@ def main():
             seeds.append(line)
 
     results = []
-    seen_by_url = set()
     visited = set()
+    # 断点续爬：加载上次已收录的索引与 URL，避免重复访问并保留历史数据
+    seen_by_url = set()
+    if os.path.exists(SEEN_FILE):
+        try:
+            with open(SEEN_FILE, "r", encoding="utf-8") as f:
+                seen_by_url = set(json.load(f))
+        except Exception as exc:
+            logger.warning("读取 seen.json 失败，从头开始: %s", exc)
+    if os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+                old = json.load(f)
+            for item in old.get("items", []):
+                url = item.get("url", "")
+                if url:
+                    seen_by_url.add(url)
+                    results.append(item)
+            logger.info("已加载 %d 条历史索引、%d 条已访问 URL，断点续爬",
+                        len(results), len(seen_by_url))
+        except Exception as exc:
+            logger.warning("读取历史索引失败: %s", exc)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -299,7 +324,7 @@ def main():
 
                 try:
                     page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
-                    page.wait_for_timeout(2500)
+                    page.wait_for_timeout(SETTLE_MS)
                 except Exception as exc:
                     logger.warning("加载失败: %s", exc)
                     continue
@@ -351,7 +376,8 @@ def main():
                 # 收集新链接
                 if depth < MAX_DEPTH:
                     for link in collect_links(page):
-                        if link in visited:
+                        # 已收录过或已计划访问的链接不再入队，实现断点续爬
+                        if link in visited or link in seen_by_url:
                             continue
                         lk = classify_url(link)
                         if lk == "content":
