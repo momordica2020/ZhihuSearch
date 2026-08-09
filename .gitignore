@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 敏感：知乎登录 Cookie，切勿提交
+crawler/cookie.txt
+
+# Chromium 调试日志
+debug.log
+
+# 爬取断点文件（可重新生成）
+data/seen.json
