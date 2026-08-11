@@ -155,6 +155,42 @@ class ParserTest(unittest.TestCase):
             200, '{"captcha":{"captchaNeeded":true}}'))
         self.assertTrue(self.c.http_blocked(200, "<title>安全验证</title>"))
 
+    def test_save_progress_preserves_nonempty_index(self):
+        """结果为 0 但历史索引非空时，不得覆盖旧索引（防误清空）。"""
+        import tempfile
+        c = self.c
+        tmp = tempfile.TemporaryDirectory()
+        keys = ("OUTPUT_FILE", "GZ_FILE", "PARTS_DIR", "SEEN_FILE",
+                "STATS_FILE", "FULL_DUMP")
+        old = {k: getattr(c, k) for k in keys}
+        try:
+            c.OUTPUT_FILE = os.path.join(tmp.name, "index.json")
+            c.GZ_FILE = c.OUTPUT_FILE + ".gz"
+            c.PARTS_DIR = os.path.join(tmp.name, "parts")
+            c.SEEN_FILE = os.path.join(tmp.name, "seen.json")
+            c.STATS_FILE = os.path.join(tmp.name, "stats.json")
+            c.FULL_DUMP = os.path.join(tmp.name, "index.full.json")
+            good = {
+                "generated_at": "x", "count": 1,
+                "items": [{"kind": "问题", "title": "t",
+                           "url": "https://www.zhihu.com/question/1"}],
+            }
+            with open(c.OUTPUT_FILE, "w", encoding="utf-8") as f:
+                json.dump(good, f, ensure_ascii=False)
+
+            c.save_progress([], {"https://www.zhihu.com/question/9"},
+                            {"visited": 0})
+
+            with open(c.OUTPUT_FILE, "r", encoding="utf-8") as f:
+                self.assertEqual(json.load(f)["count"], 1)
+            with open(c.SEEN_FILE, "r", encoding="utf-8") as f:
+                self.assertIn("https://www.zhihu.com/question/9",
+                              json.load(f))
+        finally:
+            for k, v in old.items():
+                setattr(c, k, v)
+            tmp.cleanup()
+
 
 class E2ETest(unittest.TestCase):
     def _run(self, env, data_dir):

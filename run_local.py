@@ -23,6 +23,7 @@
 import os
 import sys
 import json
+import gzip
 import time
 import argparse
 import logging
@@ -101,15 +102,88 @@ def has_changes():
 
 
 def sync_remote():
-    """推送前先拉取远程变更并变基，避免远程领先导致推送被拒。"""
+    """推送前先拉取远程变更并变基；数据文件冲突时自动按 URL 求并集。"""
     try:
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"],
-                       cwd=BASE_DIR, check=True, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace")
-        return True
-    except subprocess.CalledProcessError as exc:
-        logger.warning("拉取远程失败: %s", exc)
+        r = subprocess.run(["git", "pull", "--rebase", "origin", "main"],
+                           cwd=BASE_DIR, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if r.returncode == 0:
+            return True
+        # 变基冲突：data/ 是生成文件，直接自动合并而不是让用户手工处理
+        if resolve_data_conflicts():
+            r2 = subprocess.run(
+                ["git", "-c", "core.editor=true", "rebase", "--continue"],
+                cwd=BASE_DIR, capture_output=True, text=True,
+                encoding="utf-8", errors="replace",
+            )
+            if r2.returncode == 0:
+                return True
+            logger.warning("变基继续失败: %s", r2.stderr.strip()[:300])
+        logger.warning("拉取远程失败: %s", r.stderr.strip()[:300])
         return False
+    except subprocess.CalledProcessError as exc:
+        logger.warning("拉取远程异常: %s", exc)
+        return False
+
+
+def resolve_data_conflicts():
+    """把 data/ 的冲突文件合并：索引按 URL 求并集，其他取本地版本。"""
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain", "--", "data/"],
+            cwd=BASE_DIR, capture_output=True, text=True,
+            encoding="utf-8", errors="replace",
+        ).stdout
+    except Exception as exc:
+        logger.warning("检查冲突失败: %s", exc)
+        return False
+    conflicted = [line[3:].strip() for line in out.splitlines()
+                  if line.startswith("UU ")]
+    if not conflicted:
+        return False
+    logger.info("检测到 data/ 冲突 %s，自动合并…", conflicted)
+
+    index_rel = "data/index.json"
+    if index_rel in conflicted:
+        try:
+            ours = subprocess.run(["git", "show", ":2:%s" % index_rel],
+                                  cwd=BASE_DIR, capture_output=True).stdout
+            theirs = subprocess.run(["git", "show", ":3:%s" % index_rel],
+                                    cwd=BASE_DIR, capture_output=True).stdout
+            a, b = json.loads(ours), json.loads(theirs)
+        except Exception as exc:
+            logger.warning("索引冲突合并失败（手工处理）: %s", exc)
+            return False
+        merged = {}
+        for it in (a.get("items") or []):
+            if it.get("url"):
+                merged[it["url"]] = it
+        for it in (b.get("items") or []):
+            if it.get("url") and it["url"] not in merged:
+                merged[it["url"]] = it
+        compact = json.dumps({
+            "generated_at": max(a.get("generated_at", ""), b.get("generated_at", "")),
+            "count": len(merged),
+            "items": list(merged.values()),
+        }, ensure_ascii=False, separators=(",", ":"))
+        with open(os.path.join(BASE_DIR, index_rel), "w", encoding="utf-8") as f:
+            f.write(compact)
+        gz_path = os.path.join(BASE_DIR, "data", "index.json.gz")
+        with open(gz_path, "wb") as f:
+            with gzip.GzipFile(fileobj=f, mode="wb", mtime=0) as gz:
+                gz.write(compact.encode("utf-8"))
+        subprocess.run(["git", "add", "--", index_rel, "data/index.json.gz"],
+                       cwd=BASE_DIR, check=True)
+        logger.info("索引冲突已合并：%d 条", len(merged))
+
+    for path in conflicted:
+        if path == index_rel or path == "data/index.json.gz":
+            continue
+        subprocess.run(["git", "checkout", "--ours", "--", path],
+                       cwd=BASE_DIR, check=True)
+        subprocess.run(["git", "add", "--", path], cwd=BASE_DIR, check=True)
+        logger.info("%s 冲突已取本地版本", path)
+    return True
 
 
 def commit_and_push():

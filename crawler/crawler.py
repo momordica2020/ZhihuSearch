@@ -784,6 +784,34 @@ def save_progress(results, seen_by_url, stats=None):
     count = len(results)
     stats = stats or {}
 
+    # 防误清空：结果为 0 但历史索引非空（常见于启动瞬间被 Ctrl+C 中断、
+    # 历史文件损坏读取失败等），此时覆盖会永久丢失全部数据，必须保留旧索引。
+    prev_count = 0
+    if not results and os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+                prev = json.load(f)
+            prev_count = len(prev.get("items") or []) or prev.get("count", 0)
+        except Exception:
+            prev_count = 0
+        if prev_count > 0:
+            logger.warning(
+                "本次结果为空但历史索引有 %d 条，保留旧索引（防止误清空）",
+                prev_count,
+            )
+            with open(SEEN_FILE, "w", encoding="utf-8") as f:
+                json.dump(sorted(seen_by_url), f, ensure_ascii=False)
+            with open(STATS_FILE, "w", encoding="utf-8") as f:
+                json.dump({
+                    "generated_at": stamp,
+                    "total": prev_count,
+                    "new_items": 0,
+                    "visited": stats.get("visited", 0),
+                    "mode": "preserved",
+                    "shards": 1,
+                }, f, ensure_ascii=False, separators=(",", ":"))
+            return
+
     # 本地调试用完整快照（不入 git）
     with open(FULL_DUMP, "w", encoding="utf-8") as f:
         json.dump(
